@@ -1,11 +1,11 @@
 import chalk from 'chalk';
 import yargs from 'yargs';
 import {hideBin} from "yargs/helpers";
-import { addNote, getNote } from './notes.js';
+import { addNote, getNote, removeNote } from './notes.js';
 
+const yargsClient = yargs(hideBin(process.argv))
 
-yargs(hideBin(process.argv))
-    .command('add', 'List all commands', {
+yargsClient.command('add', 'List all commands', {
         title: {
             describe: "Note title",
             demandOption: true,
@@ -17,7 +17,17 @@ yargs(hideBin(process.argv))
             type: 'string'
         }
     }, (argv) => {
-        console.log(argv);
         addNote(argv.title, argv.body)
-    })
-    .parse();
+});
+
+yargsClient.command('remove', 'Remove note from the notes', {
+    title: {
+        describe: "Note title",
+        demandOption: true,
+        type: 'string'
+    }
+}, (argv) => {
+    removeNote(argv.title)
+})
+
+yargsClient.parse()
