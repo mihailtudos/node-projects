@@ -3,14 +3,22 @@ import fs from 'fs';
 
 const FILE_PATH = './notes.json';
 
-export const getNote = () => {
-    return 'Your notes...';
+export const readNote = function(title) {
+    const notes = loadNotes();
+    const note = getNote(notes, title);
+    if (note) {
+        console.log(chalk.inverse.green(`\nYour note:\n`));
+        console.log(`\t title: ${note.title}`);
+        console.log(`\t body: ${note.body}`);
+    } else {
+        console.log(chalk.inverse.red(`\nNote ${title} note found`));
+    }
 }
 
 export const addNote = function(title, body) {
     const notes = loadNotes();
 
-    if (!isNoteInNotes(notes, title)) {
+    if (!getNote(notes, title)) {
         console.log(chalk.green(`
         Adding new note:
             title: ${title}
@@ -52,8 +60,8 @@ export const listNotes = function() {
     }
 }
 
-function isNoteInNotes(notes, title) {
-    return notes.some(note => note.title.toLowerCase() === title.toLowerCase());
+function getNote(notes, title) {
+    return notes.find(note => note.title.toLowerCase() === title.toLowerCase());
 }
 
 function loadNotes() {
