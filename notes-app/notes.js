@@ -42,6 +42,16 @@ export const removeNote = function(title) {
     }
 }
 
+export const listNotes = function() {
+    const notes = loadNotes();
+    if(notes.length) {
+        console.log(chalk.bold.green.inverse('\nYour notes:\n'));
+        notes.forEach((note, index) => console.log(`\t ${index}. ${note.title}`));
+    } else {
+        console.log(chalk.bold.green.inverse('\nThere are no notes.\n'));
+    }
+}
+
 function isNoteInNotes(notes, title) {
     return notes.some(note => note.title.toLowerCase() === title.toLowerCase());
 }
