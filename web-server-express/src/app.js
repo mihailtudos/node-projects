@@ -4,10 +4,12 @@ require ('dotenv/config');
 const PORT = process.env.PORT || 3000;
 
 const publicPath = express.static(path.join(__dirname, '../public'));
+const viewsPath = path.join(__dirname, '../templates');
 
 const app = express();
 app.use(publicPath);
 app.set('view engine', 'hbs');
+app.set('views', viewsPath);
 
 app.get('', (req, res) => {
     res.render('index', {
