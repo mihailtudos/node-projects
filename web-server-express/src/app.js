@@ -43,6 +43,14 @@ app.get('/weather', (req, res) => {
     res.send("weater page");
 });
 
+app.get('*', (req, res) => {
+    res.render('404', {
+        title: "404",
+        author: 'Mihail Tudos',
+        message: "Page not found..."
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Server started at ${PORT} 🔥🔥🔥`)
 });
