@@ -1,21 +1,12 @@
-import express from 'express';
-import 'dotenv/config';
-
-const app = express();
-app.use(express.static('public'))
+const express = require('express');
+const path = require('path');
+require ('dotenv/config');
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-    res.send("Hello World");
-});
+const publicPath = express.static(path.join(__dirname, '../public'));
 
-app.get('/help', (req, res) => {
-    res.send("help page");
-});
-
-app.get('/about', (req, res) => {
-    res.send("about page");
-});
+const app = express();
+app.use(publicPath);
 
 app.get('/weather', (req, res) => {
     res.send("weater page");
