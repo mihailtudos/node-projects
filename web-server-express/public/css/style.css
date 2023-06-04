@@ -54,6 +54,37 @@ h1 {
     overflow: hidden;
 }
 
+.weather__form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: start;
+    flex-wrap: wrap;
+}
+
+.weather__form--input {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.weather__form--input input {
+    font-size: 1.5rem;
+}
+
+.weather__form button {
+    background: #707070;
+    color: #eee;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.weather__form button:hover {
+    opacity: .9;
+}
 
 
-
+.weather__form--input small {
+    font-size: .7rem;
+    display: block;
+    color: red;
+}

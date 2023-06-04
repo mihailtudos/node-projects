@@ -7,11 +7,23 @@
     <title>{{ title }}</title>
     <link rel="icon" href="./images/cloud.svg" type="image/x-icon">
     <link rel="stylesheet" href="./css/style.css">
-    <script src="./js/app.js"></script>
+    <script src="./js/app.js" defer></script>
 </head>
 <body>
     <div class="main-content">
         {{>header}}
+        <p>{{ message }}</p>
+        <form class="weather__form">
+            <div class="weather__form--input">
+                <input type="text" placeholder="Enter an address">
+                <small class="input-error"></small>
+            </div>
+            <button type="submit">search</button>
+        </form>
+
+        <div class="weather__response">
+
+        </div>
     </div>
     {{>footer}}
 </body>

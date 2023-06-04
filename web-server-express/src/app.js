@@ -1,7 +1,9 @@
 const express = require('express');
 const path = require('path');
 const hbs = require('hbs');
+const { geocode, forecast } = require('./utils');
 require ('dotenv/config');
+
 const PORT = process.env.PORT || 3000;
 
 const publicPath = express.static(path.join(__dirname, '../public'));
@@ -19,6 +21,7 @@ app.get('', (req, res) => {
         title: "Weather app",
         name: "Mihail Tudos",
         author: "Mihail Tudos",
+        message: "Use this website to get weather info"
     });
 });
 
@@ -40,7 +43,30 @@ app.get('/help', (req, res) => {
 
 
 app.get('/weather', (req, res) => {
-    res.send("weater page");
+    const address = req.query.address;
+    if (!address) {
+        return res.send({
+            error: "You must provide a search"
+        });
+    }
+
+    geocode(address, (error, {longitude, latitude, location} = {}) => {
+        if (error) {
+            return res.send({ error })
+        }
+        forecast(longitude, latitude, (err, response) => {
+            if (err) {
+                return res.send({ error: err })
+            }
+
+            res.send({
+                weather: response,
+                location,
+                address
+            });
+            
+        });
+    });
 });
 
 app.get('*', (req, res) => {
