@@ -1,5 +1,8 @@
 {
   "type": "module",
+  "scripts": {
+    "start": "cp .env.example .env"
+  },
   "dependencies": {
     "chalk": "^5.2.0",
     "dotenv": "^16.1.3",
