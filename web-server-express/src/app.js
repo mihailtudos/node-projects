@@ -1,29 +1,41 @@
 const express = require('express');
 const path = require('path');
+const hbs = require('hbs');
 require ('dotenv/config');
 const PORT = process.env.PORT || 3000;
 
 const publicPath = express.static(path.join(__dirname, '../public'));
-const viewsPath = path.join(__dirname, '../templates');
+const viewsPath = path.join(__dirname, '../templates/views');
+const partialsPath = path.join(__dirname, '../templates/partials');
 
 const app = express();
 app.use(publicPath);
 app.set('view engine', 'hbs');
 app.set('views', viewsPath);
+hbs.registerPartials(partialsPath);
 
 app.get('', (req, res) => {
     res.render('index', {
         title: "Weather app",
-        name: "Mihail Tudos"
+        name: "Mihail Tudos",
+        author: "Mihail Tudos",
     });
 });
 
 app.get('/about', (req, res) => {
-    res.render("about");
+    res.render("about", {
+        title: "About - Weather app",
+        name: "Mihail Tudos",
+        author: "Mihail Tudos",
+    });
 });
 
 app.get('/help', (req, res) => {
-    res.render("help");
+    res.render("help", {
+        title: "Help - Weather app",
+        name: "Mihail Tudos",
+        author: "Mihail Tudos",
+    });
 });
 
 
