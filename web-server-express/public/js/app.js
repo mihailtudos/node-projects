@@ -13,7 +13,7 @@ form.addEventListener('submit', (event) => {
         return;
     }
 
-    fetch(`http://127.0.0.1:3000/weather?address=${address}`).then(res => {
+    fetch(`/weather?address=${address}`).then(res => {
         return res.json();
     })
     .then(data => {
