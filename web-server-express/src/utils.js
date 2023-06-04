@@ -14,10 +14,10 @@ const geocode = (address, callback) => {
     request({
         url,
         json: true
-    }, (err, { body }) => {
+    }, (err, { body } = {}) => {
         if (err) {
             callback("Unable to work out the geolocation, please try again later.", {});
-        } else if (body.features.length === 0) {
+        } else if (body?.features.length === 0) {
             callback(`No Geo location found for ${address}`, {})
         } else {
             const geoLocation = body.features[0];
