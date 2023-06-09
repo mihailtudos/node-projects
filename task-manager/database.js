@@ -9,22 +9,53 @@ const client = new MongoClient(url);
 // Database Name
 const dbName = 'task-manager';
 
-async function main() {
-  // Use connect method to connect to the server
-  await client.connect();
-  console.log('Connected successfully to server');
-  const db = client.db(dbName);
-  const collection = db.collection('users');
-  const insertResult = await collection.insertMany([{ a: 1 }, { a: 2 }, { a: 3 }]);
-  console.log('Inserted documents =>', insertResult);
+async function insetItem() {
+    // Use connect method to connect to the server
+    await client.connect();
+    console.log('Connected successfully to server');
+    const db = client.db(dbName);
+    const collection = db.collection('users');
 
-
-  // the following code examples can be pasted here...
-
-  return 'done.';
+    try {
+        const insertResult = await collection.insertOne({
+            name: "Mihail",
+            role: 'admin'
+        });
+        console.log(insertResult);
+        client.close();
+    } catch (err) {
+        console.log(err.message);
+    }
 }
 
-main()
-  .then()
-  .catch(console.error)
-  .finally(() => client.close())
+
+async function insertMany() {
+    // Use connect method to connect to the server
+    await client.connect();
+    console.log('Connected successfully to server');
+    const db = client.db(dbName);
+    const collection = db.collection('tasks');
+
+    try {
+        const insertResult = await collection.insertMany([
+            {
+                name: "Work",
+                completed: true
+            },
+            {
+                name: "Do sport",
+                completed: false
+            },
+            {
+                name: "Study",
+                completed: true
+            }
+        ]);
+        console.log(insertResult);
+        client.close();
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
+insertMany();
