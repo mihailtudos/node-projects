@@ -1,6 +1,4 @@
-const { MongoClient } = require('mongodb');
-// or as an es module:
-// import { MongoClient } from 'mongodb'
+const { MongoClient, ObjectId } = require('mongodb');
 
 // Connection URL
 const url = 'mongodb://127.0.0.1:27017';
@@ -58,4 +56,41 @@ async function insertMany() {
     }
 }
 
-insertMany();
+async function getItems(query) {
+    await client.connect();
+    console.log('Connected successfully to server');
+    const db = client.db(dbName);
+    const collection = db.collection('tasks');
+
+    const completedTasks = await collection.find(query).toArray();
+
+    console.log(completedTasks);
+    client.close();
+}
+
+async function updateRecord(query, update) {
+    await client.connect();
+    console.log('Connected successfully to server');
+    const db = client.db(dbName);
+    const collection = db.collection('tasks');
+    const res = await collection.updateMany(query, {$set: update});
+
+    console.log(res);
+    client.close();
+}
+
+
+async function deleteItems(query) {
+    await client.connect();
+    console.log('Connected successfully to server');
+    const db = client.db(dbName);
+    const collection = db.collection('tasks');
+    const res = await collection.deleteMany(query);
+
+    console.log(res);
+    client.close();
+}
+
+deleteItems({
+    completed: false
+});
