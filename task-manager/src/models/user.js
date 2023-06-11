@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+import bcrypt from 'bcryptjs';
 
-await mongoose.connect('mongodb://127.0.0.1:27017/task-manager-api'); 
-
-const User = mongoose.model('User', {
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -42,41 +41,14 @@ const User = mongoose.model('User', {
     }
 });
 
-const Task = mongoose.model('Task', {
-    description: {
-        type: String,
-        trim: true,
-        required: true,
-    },
-    completed: {
-        type: Boolean,
-        default: false
+userSchema.pre('save', async function(next) {
+    const user = this;
+
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 8);
     }
+
+    next();
 })
 
-const mihail = new User({
-    name: "Mihail",
-    email: "MIHAIL@gmail.com",
-    age: 28,
-    password: "   dsads",
-});
-
-// await mihail.save()
-//     .then((data) => {
-//         console.log('use: ', data);
-//     }).catch(err => {
-//         console.log('Something went wrong', err.message);
-//     });
-
-const workTask = new Task({
-    description: 'Please work daily to achive goals',
-})
-
-await workTask.save()
-    .then((data) => {
-        console.log('use: ', data);
-    }).catch(err => {
-        console.log('Something went wrong', err.message);
-    });
-    
-mongoose.disconnect();
+export const User = mongoose.model('User', userSchema);
