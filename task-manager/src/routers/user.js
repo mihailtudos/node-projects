@@ -1,7 +1,20 @@
 import express from 'express';
 import { User } from '../models/user.js';
+import { auth } from '../middleware/auth.js';
 
 const router = new express.Router();
+
+router.post('/api/v1/users/login', async (req, res) => {
+    try {
+        const user = await User.findByCreadentials(req.body.email, req.body.password);
+
+        const token = await user.generateAuthToken();
+        return res.send({ user, token });
+    } catch (err) {
+        console.log(err.message);
+        res.status(400).send();
+    }
+});
 
 router.post('/api/v1/users', async (req, res) => {
     const user = new User(req.body);
@@ -15,13 +28,31 @@ router.post('/api/v1/users', async (req, res) => {
     }
 });
 
-router.get('/api/v1/users', async (req, res) => {
+router.post('/api/v1/users/logout', auth, async (req, res) => {
     try {
-        const users = await User.find({});
-        return res.send({code: 200, users});
-    } catch(err) {
-        return res.status(400).send({error: err.message})
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token != req.token;
+        });
+
+        await req.user.save();
+        res.send();
+    } catch (error) {
+        res.status(500).send();
     }
+});
+
+router.post('/api/v1/users/logoutAll', auth, async (req, res) => {
+    try {
+        req.user.tokens = [];
+        await req.user.save();
+        res.send();
+    } catch (error) {
+        res.status(500).send();
+    }
+});
+
+router.get('/api/v1/users/me', auth, async (req, res) => {
+    return res.send(req.user);
 });
 
 router.get('/api/v1/users/:id', async (req, res) => {
@@ -83,14 +114,5 @@ router.delete('/api/v1/users/:id', async (req, res) => {
     }
 });
 
-router.post('/api/v1/users/login', async (req, res) => {
-    try {
-        const user = await User.findByCreadentials(req.body.email, req.body.password);
-        const token = await user.generateAuthToken();
-        res.send({ user, token });
-    } catch (err) {
-        res.status(400).send();
-    }
-});
 
 export default router;
