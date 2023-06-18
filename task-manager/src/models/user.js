@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { Task } from './task.js';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -47,6 +48,8 @@ const userSchema = new mongoose.Schema({
             required: true
         } 
     }]
+}, {
+    timestamps: true,
 });
 
 userSchema.methods.generateAuthToken = async function() {
@@ -55,6 +58,22 @@ userSchema.methods.generateAuthToken = async function() {
     user.tokens = user.tokens.concat({ token });
     await user.save();
     return token;
+}
+
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+});
+
+userSchema.methods.toJSON = function() {
+    const user = this;
+    const userObject = user.toObject();
+
+    delete userObject.tokens;
+    delete userObject.password;
+
+    return userObject;
 }
 
 userSchema.statics.findByCreadentials = async (email, password) => {
@@ -73,6 +92,7 @@ userSchema.statics.findByCreadentials = async (email, password) => {
     return user;
 }
 
+// Hash pw when saved
 userSchema.pre('save', async function(next) {
     const user = this;
 
@@ -81,6 +101,14 @@ userSchema.pre('save', async function(next) {
     }
 
     next();
-})
+});
+
+// Delete user tasks on user deletion
+userSchema.pre('deleteOne', async function(next) {
+    const user = this;
+    
+    await Task.deleteMany({ owner: user._id });
+    next();
+});
 
 export const User = mongoose.model('User', userSchema);

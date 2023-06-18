@@ -9,7 +9,7 @@ router.post('/api/v1/users/login', async (req, res) => {
         const user = await User.findByCreadentials(req.body.email, req.body.password);
 
         const token = await user.generateAuthToken();
-        return res.send({ user, token });
+        res.send({ user, token });
     } catch (err) {
         console.log(err.message);
         res.status(400).send();
@@ -55,20 +55,7 @@ router.get('/api/v1/users/me', auth, async (req, res) => {
     return res.send(req.user);
 });
 
-router.get('/api/v1/users/:id', async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        if (!user) {
-            return res.status(404).send({error: "User not found."})
-        }
-
-        return res.send({code: 200, user});
-    } catch(err) {
-        return res.status(400).send({error: err.message})
-    }
-});
-
-router.patch('/api/v1/users/:id', async (req, res) => {
+router.patch('/api/v1/users/me', auth, async (req, res) => {
     const allowedUpdates = ['name', 'age', 'email', 'password'];
     const updates = Object.keys(req.body);
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
@@ -77,19 +64,11 @@ router.patch('/api/v1/users/:id', async (req, res) => {
         return res.status(400).send({error: "Invalid updates!"});
     }
 
-    if (!req.params.id) {
-        return res.status(500).send({error: "No id provided"});
-    }
-
     try {
-        const user = await User.findById(req.params.id);
+        const user = req.user;
         updates.forEach(update => user[update] = req.body[update]);
 
         await user.save();
-
-        if (!user) {
-            return res.status(404).send({error: 'User not found'});
-        }
 
         return res.send(user);
     } catch (error) {
@@ -97,18 +76,10 @@ router.patch('/api/v1/users/:id', async (req, res) => {
     }
 });
 
-router.delete('/api/v1/users/:id', async (req, res) => {
-    if (!req.params.id) {
-        return res.status(500).send({error: "No id provided"});
-    }
-
+router.delete('/api/v1/users/me', auth, async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id);
-        if (!user) {
-            return res.status(404).send({error: "User not found."})
-        }
-
-        return res.send({code: 200, user});
+        await User.deleteOne({_id: req.user._id});
+        res.send(req.user);
     } catch(err) {
         return res.status(400).send({error: err.message})
     }
