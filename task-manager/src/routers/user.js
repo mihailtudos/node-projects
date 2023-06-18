@@ -1,6 +1,7 @@
 import express from 'express';
 import { User } from '../models/user.js';
 import { auth } from '../middleware/auth.js';
+import multer from 'multer';
 
 const router = new express.Router();
 
@@ -85,5 +86,25 @@ router.delete('/api/v1/users/me', auth, async (req, res) => {
     }
 });
 
+
+const multerUpload = multer({
+    dest: 'images/avatars',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        console.log();
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(new Error('Uploaded file must be an image.'))
+        }
+
+        return cb(undefined, true);
+    }
+});
+
+router.post('/api/v1/users/me/avatar', [auth, multerUpload.single('avatar')], (req, res) => {
+
+    res.send();
+});
 
 export default router;
