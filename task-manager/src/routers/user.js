@@ -88,7 +88,6 @@ router.delete('/api/v1/users/me', auth, async (req, res) => {
 
 
 const multerUpload = multer({
-    dest: 'images/avatars',
     limits: {
         fileSize: 1000000
     },
@@ -102,9 +101,36 @@ const multerUpload = multer({
     }
 });
 
-router.post('/api/v1/users/me/avatar', [auth, multerUpload.single('avatar')], (req, res) => {
-
+router.post('/api/v1/users/me/avatar', [auth, multerUpload.single('avatar')], async (req, res) => {
+    req.user.avatar = req.file.buffer;
+    await req.user.save();
     res.send();
+}, (err, req, res, next) => {
+    return res.status(400).send(err.message);
+});
+
+router.delete('/api/v1/users/me/avatar', auth, async (req, res) => {
+    if ('avatar' in req.user) {
+        req.user.avatar = undefined;
+        await req.user.save();
+    }
+    return res.send();
+});
+
+router.get('/api/v1/users/:id/avatar', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user || !user.avatar) {
+            throw new Error('Resource not found.');
+        }
+
+        res.set('Content-Type', 'image/jpg');
+        res.send(user.avatar);
+        
+    } catch (error) {
+        res.status(404).send();
+    }
 });
 
 export default router;
