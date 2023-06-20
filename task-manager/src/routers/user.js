@@ -2,6 +2,8 @@ import express from 'express';
 import { User } from '../models/user.js';
 import { auth } from '../middleware/auth.js';
 import multer from 'multer';
+import sharp from 'sharp'
+import { sendCancelationEmail, sendWelcomeEmail } from '../emails/account.js';
 
 const router = new express.Router();
 
@@ -22,7 +24,7 @@ router.post('/api/v1/users', async (req, res) => {
     try {
         await user.save();
         const token = await user.generateAuthToken();
-
+        sendWelcomeEmail(user.email, user.name);
         return res.status(201).send({ user, token });
     } catch(err) {
         return res.status(400).send({error: err.message})
@@ -79,7 +81,9 @@ router.patch('/api/v1/users/me', auth, async (req, res) => {
 
 router.delete('/api/v1/users/me', auth, async (req, res) => {
     try {
-        await User.deleteOne({_id: req.user._id});
+        const user = req.user;
+        await User.deleteOne({_id: user._id});
+        sendCancelationEmail(user.email, user.name)
         res.send(req.user);
     } catch(err) {
         return res.status(400).send({error: err.message})
@@ -102,7 +106,8 @@ const multerUpload = multer({
 });
 
 router.post('/api/v1/users/me/avatar', [auth, multerUpload.single('avatar')], async (req, res) => {
-    req.user.avatar = req.file.buffer;
+    const buffer = await sharp(req.file.buffer).png().resize({ width: 250, height: 250 }).toBuffer();
+    req.user.avatar = buffer;
     await req.user.save();
     res.send();
 }, (err, req, res, next) => {
@@ -125,7 +130,7 @@ router.get('/api/v1/users/:id/avatar', async (req, res) => {
             throw new Error('Resource not found.');
         }
 
-        res.set('Content-Type', 'image/jpg');
+        res.set('Content-Type', 'image/png');
         res.send(user.avatar);
         
     } catch (error) {
