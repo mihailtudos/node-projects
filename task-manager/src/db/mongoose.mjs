@@ -1,4 +1,4 @@
 import mongoose from 'mongoose';
-await mongoose.connect('mongodb://127.0.0.1:27017/task-manager-api'); 
+await mongoose.connect(process.env.DATABASE_URL); 
 
 export default mongoose;
