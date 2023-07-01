@@ -8,7 +8,7 @@
     "start": "node ./src/index.js",
     "dev": "env-cmd nodemon ./src/index.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
-    "test-dev": "NODE_OPTIONS=--experimental-vm-modules env-cmd -f ./config/.env.test npx jest --watch"
+    "test-dev": "NODE_OPTIONS=--experimental-vm-modules  env-cmd -f ./config/.env.test npx jest --detectOpenHandles --watch --runInBand"
   },
   "jest": {
     "testEnviroment": "node"
